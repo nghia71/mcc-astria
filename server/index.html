@@ -1,0 +1,106 @@
+<html>
+
+  <head>
+    <title>Current status</title>
+    <script>
+      Number.prototype.pad = function (n) {
+        for (var r = this.toString(); r.length < n; r = 0 + r);
+        return r;
+      };
+
+      function updateClock() {
+        var now = new Date();
+        var milli = now.getMilliseconds(),
+          sec = now.getSeconds(),
+          min = now.getMinutes(),
+          hou = now.getHours(),
+          mo = now.getMonth(),
+          dy = now.getDate(),
+          yr = now.getFullYear();
+        var months = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ];
+        var tags = ["mon", "d", "y", "h", "m", "s"],
+          corr = [months[mo], dy, yr, hou.pad(2), min.pad(2), sec.pad(2)];
+        for (var i = 0; i < tags.length; i++)
+          document.getElementById(tags[i]).firstChild.nodeValue = corr[i];
+        update_data();
+      }
+
+      async function update_data() {
+        let response = await fetch("/fetch");
+        let resp = await response.json();
+        console.log(resp.data);
+        if (resp.data.length > 0) {
+            document.getElementById("data").innerHTML = resp.data[0].status;
+        }
+        await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+        return;
+      }
+
+      function initClock() {
+        updateClock();
+        window.setInterval("updateClock()", 3000);
+      }
+
+    </script>
+
+    <style>
+      body {background-color:#2d2d2d;}
+      #timedate {
+        font: small-caps 43px/150% "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+        text-align:left;
+        width: 50%;
+        margin: auto;
+        color: #FFF;
+        /* border-left: 1px solid #ed1f24; */
+        padding: 20px;
+      }
+      #data {
+        font: small-caps 43px/150% "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+        text-align:left;
+        width: 80%;
+        margin: auto;
+        color: #000;
+        /* border-left: 1px solid #ed1f24; */
+        padding: 20px;
+      }
+    </style>
+  </head>
+
+  <body onLoad="initClock()">
+    <table style="margin-left:auto;margin-right:auto; border-bottom: 1px solid red;">
+      <tr>
+        <td>
+          <div>
+            <img src="img/banner.jpeg" alt="MCC Team Contest" style="width:425px"/>
+          </div>
+        </td>
+        <td>
+          <div id="timedate" style="width:100%;" align="middle">
+            <a id="mon">January</a>
+            <a id="d">1</a>,
+            <a id="y">0</a><br />
+            <a id="h">12</a> :
+            <a id="m">00</a> :
+            <a id="s">00</a>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <br/>
+    <div id="data" style="color: #FFF" align="middle">Nobody is here!</div>
+  </body>
+
+</html>
